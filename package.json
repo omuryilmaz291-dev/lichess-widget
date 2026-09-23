@@ -1,6 +1,6 @@
 {
   "name": "lichess-widget",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Alt+C ile açılıp kapanan, boyutu ayarlanabilir Lichess satranç widget'ı",
   "main": "main.js",
   "author": "Lichess Widget contributors",

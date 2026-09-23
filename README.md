@@ -8,8 +8,9 @@ Alt+C ile açılıp kapanan, boyutu değiştirilebilir, her zaman üstte duran L
 2. Masaüstüne veya istediğin klasöre koy, çift tıkla. Bitti.
 
 - **Alt+C**: göster / gizle (widget dışına tıklamak gizlemez)
-- **Kenarlardan sürükle**: boyutu değiştir. Boyut ve konum hatırlanır.
-- **📌**: her zaman üstte aç/kapat, **↗**: lichess.org'u tarayıcıda aç, **✕**: gizle
+- **Kenarlardan sürükle**: boyutu değiştir (artık çok küçültülebilir). Boyut ve konum hatırlanır.
+- **📌 (sabitle)**: yeşilken pencere her zaman üstte kalır, başka yere tıklasan da gitmez. **—**: sadece başlık çubuğuna küçült / geri büyüt.
+-  **↗**: lichess.org'u tarayıcıda aç, **✕**: gizle
 - Saatin yanındaki tepsi ikonuna (♟) sağ tık: "Windows ile birlikte başlat", Çıkış
 
 > Windows "bilinmeyen yayıncı" uyarısı verebilir (exe imzasız): "Ek bilgi → Yine de çalıştır".

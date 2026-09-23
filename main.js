@@ -9,7 +9,10 @@ const path = require('path');
 const fs = require('fs');
 
 const HEADER_HEIGHT = 34;
-const BORDER = 4; // kenarlarda boşluk: boyutlandırma tutamacı + çerçeve görünümü
+const BORDER = 5; // kenarlarda boşluk: boyutlandırma tutamacı + çerçeve görünümü
+const MIN_WIDTH = 200;
+const MIN_HEIGHT = 160;
+const COLLAPSED_MIN_WIDTH = 140;
 const DEFAULT_WIDTH = 400;
 const DEFAULT_HEIGHT = 640;
 const MARGIN = 12;
@@ -21,6 +24,7 @@ let chessView = null;
 let tray = null;
 let isVisible = false;
 let isAnimating = false;
+let isCollapsed = false; // sadece başlık çubuğu görünen küçük mod
 let settings = { bounds: null, alwaysOnTop: true };
 let saveTimer = null;
 
@@ -87,6 +91,7 @@ function animateWindow(show) {
   isAnimating = true;
 
   const target = restoredBounds();
+  if (isCollapsed) target.height = HEADER_HEIGHT;
   const offset = 24;
   const from = show ? { ...target, y: target.y + offset } : { ...target };
   const to = show ? { ...target } : { ...target, y: target.y + offset };
@@ -140,10 +145,12 @@ function createWindow() {
 
   mainWindow = new BrowserWindow({
     ...b,
-    minWidth: 300,
-    minHeight: 420,
+    minWidth: MIN_WIDTH,
+    minHeight: MIN_HEIGHT,
     frame: false,
-    resizable: true, // (transparent: true olsaydı Windows'ta boyutlandırma çalışmazdı)
+    resizable: true,
+    maximizable: false,   // başlığa çift tıklayınca ekranı kaplamasın
+    fullscreenable: false, // (transparent: true olsaydı Windows'ta boyutlandırma çalışmazdı)
     movable: true,
     skipTaskbar: true,
     alwaysOnTop: settings.alwaysOnTop,
@@ -193,7 +200,10 @@ function createWindow() {
 
 function persistBounds() {
   if (!mainWindow || isAnimating || !isVisible) return;
-  settings.bounds = mainWindow.getBounds();
+  const b = mainWindow.getBounds();
+  // Küçültülmüşken yükseklik kaydedilmez; açılınca eski yüksekliğe dönülür
+  const height = isCollapsed && settings.bounds ? settings.bounds.height : b.height;
+  settings.bounds = { x: b.x, y: b.y, width: b.width, height };
   saveSettingsSoon();
 }
 
@@ -201,6 +211,30 @@ function persistBounds() {
 // Header butonları
 // ---------------------------------------------------------------------------
 ipcMain.on('widget:hide', hideWidget);
+
+// Küçült / büyüt: sadece başlık çubuğu kalır, Lichess görünümü gizlenir
+function setCollapsed(value) {
+  if (!mainWindow || isAnimating || value === isCollapsed) return;
+  const b = mainWindow.getBounds();
+  isCollapsed = value;
+  if (value) {
+    settings.bounds = { x: b.x, y: b.y, width: b.width, height: b.height };
+    mainWindow.setBrowserView(null);
+    mainWindow.setMinimumSize(COLLAPSED_MIN_WIDTH, HEADER_HEIGHT);
+    mainWindow.setMaximumSize(10000, HEADER_HEIGHT); // sadece genişlik değişebilsin
+    mainWindow.setBounds({ x: b.x, y: b.y, width: b.width, height: HEADER_HEIGHT });
+  } else {
+    const height = (settings.bounds && settings.bounds.height) || DEFAULT_HEIGHT;
+    mainWindow.setMaximumSize(0, 0); // sınırı kaldır
+    mainWindow.setMinimumSize(MIN_WIDTH, MIN_HEIGHT);
+    mainWindow.setBounds({ x: b.x, y: b.y, width: b.width, height });
+    mainWindow.setBrowserView(chessView);
+    resizeChessView();
+  }
+  mainWindow.webContents.send('widget:collapse-state', isCollapsed);
+}
+ipcMain.on('widget:toggle-collapse', () => setCollapsed(!isCollapsed));
+ipcMain.handle('widget:get-collapsed', () => isCollapsed);
 ipcMain.on('widget:open-lichess', () => shell.openExternal(LICHESS_HOME));
 ipcMain.on('widget:toggle-pin', () => {
   if (!mainWindow) return;

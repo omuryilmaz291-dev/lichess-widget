@@ -9,4 +9,7 @@ contextBridge.exposeInMainWorld('widgetAPI', {
   togglePin: () => ipcRenderer.send('widget:toggle-pin'),
   getPin: () => ipcRenderer.invoke('widget:get-pin'),
   onPinState: (cb) => ipcRenderer.on('widget:pin-state', (_e, v) => cb(v)),
+  toggleCollapse: () => ipcRenderer.send('widget:toggle-collapse'),
+  getCollapsed: () => ipcRenderer.invoke('widget:get-collapsed'),
+  onCollapseState: (cb) => ipcRenderer.on('widget:collapse-state', (_e, v) => cb(v)),
 });
