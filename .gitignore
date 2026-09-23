@@ -1,0 +1,19 @@
+# Bağımlılıklar ve derleme çıktıları (GitHub Actions bunları kendisi üretir)
+node_modules/
+release/
+dist/
+
+# Gizli bilgiler (projede yok ama yanlışlıkla eklenmesin)
+.env
+.env.*
+*.pem
+*.pfx
+*.p12
+
+# Log ve sistem dosyaları
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
