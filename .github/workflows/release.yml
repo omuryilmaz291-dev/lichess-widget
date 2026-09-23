@@ -34,8 +34,13 @@ jobs:
           Copy-Item "src-tauri/target/release/lichess-widget.exe" "dist/LichessWidget.exe"
 
       - name: GitHub Release oluştur ve exe'yi yükle
+        # Sadece gerçek bir "vX.Y.Z" tag push'unda release oluştur.
+        # workflow_dispatch ile elle çalıştırıldığında (tag yokken) bu adım atlanır,
+        # aksi halde action-gh-release "GitHub Releases requires a tag" hatası verir.
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.ref_name }}
           files: dist/LichessWidget.exe
           draft: false
           prerelease: false
