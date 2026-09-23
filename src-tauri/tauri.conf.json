@@ -1,0 +1,9 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "LichessWidget",
+  "version": "2.0.0",
+  "identifier": "com.lichesswidget.app",
+  "build": { "frontendDist": "../src" },
+  "app": { "withGlobalTauri": true, "windows": [], "security": { "csp": null } },
+  "bundle": { "active": false, "icon": ["icons/icon.png", "icons/icon.ico"] }
+}

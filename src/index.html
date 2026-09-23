@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="tr"><head><meta charset="UTF-8"><title>Lichess Widget</title>
+<style>
+  html,body{margin:0;height:100%;background:#2b2b2b;overflow:hidden;font-family:"Segoe UI",Arial,sans-serif}
+  .header{height:100%;display:flex;align-items:center;justify-content:space-between;padding:0 2px 0 6px;user-select:none}
+  .title{color:#d9d9d9;font-size:12px;display:flex;align-items:center;gap:6px}
+  .dot{width:8px;height:8px;border-radius:50%;background:#7fb84f}
+  .actions{display:flex;gap:2px}
+  button{width:26px;height:24px;border:0;border-radius:5px;background:transparent;color:#bdbdbd;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+  svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  button:hover{background:#3d3d3d;color:#fff}
+  #closeBtn:hover{background:#e5484d}
+  #pinBtn.active{color:#7fb84f;background:#3a4a30}
+  #pinBtn.active svg{fill:currentColor}
+  .ex{display:none}
+  body.collapsed .mn{display:none}
+  body.collapsed .ex{display:block}
+</style></head>
+<body>
+<div class="header" id="hdr">
+  <div class="title"><span class="dot"></span>Lichess <span id="ver" style="opacity:.5"></span></div>
+  <div class="actions">
+    <button id="pinBtn" title="Sabitle: her zaman üstte"><svg viewBox="0 0 24 24"><path d="M9 3h6l-1 6 3 3v2H7v-2l3-3-1-6z"/><path d="M12 14v7"/></svg></button>
+    <button id="minBtn" title="Küçült / büyüt"><svg class="mn" viewBox="0 0 24 24"><path d="M5 12h14"/></svg><svg class="ex" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/></svg></button>
+    <button id="openBtn" title="Tarayıcıda aç"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg></button>
+    <button id="closeBtn" title="Gizle (Alt+C)"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+</div>
+<script>
+  const invoke = window.__TAURI__.core.invoke;
+  const apply = (s) => {
+    document.getElementById('pinBtn').classList.toggle('active', s.pinned);
+    document.body.classList.toggle('collapsed', s.collapsed);
+    document.getElementById('ver').textContent = 'v' + s.version;
+  };
+  const bind = (id, cmd) => document.getElementById(id).onclick = () => invoke(cmd).then(s => s && apply(s));
+  bind('pinBtn', 'toggle_pin'); bind('minBtn', 'toggle_collapse');
+  bind('openBtn', 'open_lichess'); bind('closeBtn', 'hide_widget');
+  document.getElementById('hdr').addEventListener('mousedown', e => {
+    if (e.button === 0 && !e.target.closest('button')) invoke('start_drag');
+  });
+  invoke('get_state').then(apply);
+</script>
+</body></html>
